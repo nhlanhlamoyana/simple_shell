@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-void display_prompt (void);
-void nhlanhla_print (const char *note);
-void read_format (char *format, size_t size);
-void execute_command (const char *command);
+void display_prompt(void);
+void nhlanhla_print(const char *note);
+void read_format(char *format, size_t size);
+void execute_command(const char *command);
 
 #endif
