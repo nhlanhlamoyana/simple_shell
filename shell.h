@@ -6,6 +6,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <limits.h>
+#include <signal.h>
 
 void display_prompt(void);
 void nhlanhla_print(const char *note);
