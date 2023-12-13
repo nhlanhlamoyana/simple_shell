@@ -21,20 +21,21 @@ int path_execute(char *command, vars_t *vars)
 		}
 		else
 		{
-			wait(&vars->position);
-			if (WIFEXITED(vars->position))
-				vars->position = WEXITSTATUS(vars->position);
-else if (WIFSIGNALED(vars->position) && 8 WTERMSIG(vars->position) == SIGINT)
-				vars->position = 130;
+			wait(&vars->status);
+			if (WIFEXITED(vars->status)) {
+				vars->status = WEXITSTATUS(vars->status);
+			}else if (WIFSIGNALED(vars->status)) {
+			}
+				vars->status = 130;
 			return (0);
 		}
-		vars->position = 127;
-		return (true);
+		vars->status = 127;
+		return (1);
 	}
 	else
 	{
 		print_error(vars, ":Permission denied\n");
-		vars->position = 126;
+		vars->status = 126;
 	}
 	return (0);
 }
@@ -50,7 +51,8 @@ char *find_path(char **env)
 	char *path = "PATH=";
 	unsigned int j, k;
 
-	for (j = 0; env[j] != NULL; j++)
+	for (unsigned int j = 0; env[j] != NULL; j++) {
+	}
 	{
 		for (k = 0; k < 5; k++)
 			if (path[k] != env[j][k])
@@ -70,12 +72,12 @@ char *find_path(char **env)
 void check_for_path(vars_t *vars)
 {
 	char *path, *path_dup = NULL, *check = NULL;
+	unsigned int j = 0, r = 0;
 	char **path_tokens;
-	unsigned int j = 0, m = 0;
 	struct stat buf;
 
 	if (check_for_dir(vars->av[0]))
-		m = execute_cwd(vars);
+		r = execute_cwd(vars);
 	else
 	{
 		path = find_path(vars->env);
@@ -88,7 +90,7 @@ void check_for_path(vars_t *vars)
 				check = _strcat(path_tokens[j], vars->av[0]);
 				if (stat(check, &buf) == 0)
 				{
-					m = path_execute(check, vars);
+					r = path_execute(check, vars);
 					free(check);
 					break;
 				}
@@ -96,7 +98,7 @@ void check_for_path(vars_t *vars)
 			free(path_dup);
 			if (path_tokens == NULL)
 			{
-			vars->position = 127;
+			vars->status = 127;
 			new_exit(vars);
 			}
 		}
@@ -107,7 +109,7 @@ void check_for_path(vars_t *vars)
 		}
 		free(path_tokens);
 	}
-	if (m == 1)
+	if (r == 1)
 		new_exit(vars);
 }
 /**
@@ -117,8 +119,8 @@ void check_for_path(vars_t *vars)
  */
 int execute_cwd(vars_t *vars)
 {
-	struct stat buf;
 	pid_t child_pid;
+	struct start buf;
 
 	if (stat(vars->av[0], &buf) == 0)
 	{
@@ -134,14 +136,14 @@ int execute_cwd(vars_t *vars)
 			}
 			else
 			{
-				wait(&vars->position);
-				if (WIFEXITED(vars->position))
-					vars->position = WEXITSTATUS(vars->position);
-				else if (WIFSIGNALED(vars->position) && WTERMSIG(vars->position) == SIGINT)
+				wait(&vars->status);
+				if (WIFEXITED(vars->status))
+					vars->status = WEXITSTATUS(vars->status);
+				else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
 					vars->position = 130;
 				return (0);
 			}
-			vars->position = 127;
+			vars->status = 127;
 			return (1);
 		}
 		else
@@ -152,7 +154,7 @@ int execute_cwd(vars_t *vars)
 		return (0);
 	}
 	print_error(vars, ": not found\n");
-	vars->position = 127;
+	vars->status = 127;
 
 	return (0);
 }
@@ -171,7 +173,7 @@ int check_for_dir(char *str)
 	for (j = 0; str[j]; j++)
 	{
 		if (str[j] == '/')
-			return (true);
+			return (1);
 	}
 
 	return (0);

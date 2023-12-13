@@ -31,7 +31,8 @@ char **tokenize(char *buffer, char *delimiter)
 				perror("Fatal Error");
 				return (NULL);
 			}
-		}	
+		}
+
 		buffer = NULL;
 	}
 	return (tokens);
