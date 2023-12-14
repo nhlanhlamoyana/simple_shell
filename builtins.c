@@ -35,15 +35,15 @@ void (*check_for_builtins(vars_t *vars))(vars_t *vars)
  */
 void new_exit(vars_t *vars)
 {
-	int position;
+	int status;
 
 
 	if (_strcmpr(vars->av[0], "exit") == 0 && vars->av[1] != NULL)
 	{
-		position = _atoi(vars->av[1]);
-		if (position == -1)
+		status = _atoi(vars->av[1]);
+		if (status == -1)
 		{
-			vars->position = 2;
+			vars->status = 2;
 			_puts2(vars->av[1]);
 			_puts2("\n");
 			print_error(vars, ": Illegal number: ");
@@ -51,13 +51,13 @@ void new_exit(vars_t *vars)
 			vars->commands = NULL;
 			return;
 		}
-		vars->position = position;
+		vars->status = status;
 	}
 	free(vars->av);
 	free(vars->commands);
 	free(vars->buffer);
 	free_env(vars->env);
-	exit(vars->position);
+	exit(vars->status);
 }
 
 /**
@@ -74,7 +74,7 @@ void _env(vars_t *vars)
 		_puts(vars->env[j]);
 		_puts("\n");
 	}
-	vars->position = 0;
+	vars->status = 0;
 }
 
 /**
@@ -90,7 +90,7 @@ void new_setenv(vars_t *vars)
 
 	if (vars->av[1] == NULL || vars->av[2] == NULL)
 	{
-		vars->position = 2;
+		vars->status = 2;
 
 		print_error(vars, ": Incorrect number of arguments\n");
 
@@ -114,7 +114,7 @@ void new_setenv(vars_t *vars)
 		free(*key);
 		*key = var;
 	}
-	vars->position = 0;
+	vars->status = 0;
 }
 
 
@@ -126,7 +126,7 @@ void new_setenv(vars_t *vars)
  */
 void new_unsetenv(vars_t *vars)
 {
-	char **latestenv, **key;
+	char **newenv, **key;
 
 
 	unsigned int j, k;
@@ -134,7 +134,7 @@ void new_unsetenv(vars_t *vars)
 
 	if (vars->av[1] == NULL)
 	{
-		vars->position = 2;
+		vars->status = 2;
 		print_error(vars, ": Incorrect number of arguments\n");
 
 		return;
@@ -147,20 +147,20 @@ void new_unsetenv(vars_t *vars)
 	}
 	for (j = 0; vars->env[j] != NULL; j++)
 		;
-	latestenv = malloc(sizeof(char *) * j);
-	if (latestenv == NULL)
+	newenv = malloc(sizeof(char *) * j);
+	if (newenv == NULL)
 	{
-		vars->position = 127;
+		vars->status = 127;
 		print_error(vars, NULL);
 		new_exit(vars);
 	}
 	for (j = 0; vars->env[j] != *key; j++)
-		latestenv[j] = vars->env[j];
+		newenv[j] = vars->env[j];
 	for (k = j + 1; vars->env[k] != NULL; k++, j++)
-		latestenv[j] = vars->env[k];
-	latestenv[j] = NULL;
+		newenv[j] = vars->env[k];
+	newenv[j] = NULL;
 	free(vars->env);
 	free(*key);
-	vars->position = 0;
-	vars->env = latestenv;
+	vars->status = 0;
+	vars->env = newenv;
 }	

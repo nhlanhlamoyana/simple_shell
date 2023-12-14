@@ -19,7 +19,7 @@
  * @env: environment variables
  * @argv: arguments at opening of shell
  * @av: command line arguments
- * @position: exit position
+ * @status: exit status
  */
 typedef struct variables
 {
@@ -28,7 +28,7 @@ typedef struct variables
 	char **av;
 	size_t count;
 	char **commands;
-	int position;
+	int status;
 	char **argv;
 
 } vars_t;
@@ -79,8 +79,5 @@ void print_error(vars_t *vars, char *msg);
 char *_uitoa(unsigned int count);
 
 
-void display_prompt(void);
-void nhlanhla_print(const char *note);
-void read_format(char *format, size_t size);
-void execute_command(const char *command);
+
 #endif

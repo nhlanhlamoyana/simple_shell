@@ -22,37 +22,35 @@ int path_execute(char *command, vars_t *vars)
 		else
 		{
 			wait(&vars->status);
-			if (WIFEXITED(vars->status)) {
+			if (WIFEXITED(vars->status)) 
 				vars->status = WEXITSTATUS(vars->status);
-			}else if (WIFSIGNALED(vars->status)) {
-			}
+			else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
 				vars->status = 130;
 			return (0);
 		}
 		vars->status = 127;
 		return (1);
+		
 	}
 	else
 	{
-		print_error(vars, ":Permission denied\n");
+		print_error(vars, ": Permission denied\n");
 		vars->status = 126;
 	}
 	return (0);
 }
 
 /**
- * find_path - Finds the PATH variable
+ * find_path - Finds the PATH variable in the environment
  * @env: The array of environment variables
  * Return: NULL if failure, or pointer to the node that contains the PATH
  */
-char *find_path(char **env)
-
+char *find_path( char **env){
 
 	char *path = "PATH=";
 	unsigned int j, k;
 
-	for (unsigned int j = 0; env[j] != NULL; j++) {
-	}
+	for (j = 0; env[j] != NULL; j++)
 	{
 		for (k = 0; k < 5; k++)
 			if (path[k] != env[j][k])
@@ -65,42 +63,41 @@ char *find_path(char **env)
 
 
 /**
- * check_for_path - The command gets checked if the command is in the PATH
- * @vars: Variables
- * Return:void
+ * check_for_path - Command to be checked if it is in the PATH and executes it
+ * @vars: variables
+ * Return: void
  */
-void check_for_path(vars_t *vars)
-{
-	char *path, *path_dup = NULL, *check = NULL;
-	unsigned int j = 0, r = 0;
-	char **path_tokens;
-	struct stat buf;
+void check_for_path(vars_t *vars){
+			char *path, *path_dup = NULL, *check = NULL;
+			unsigned int j = 0, r = 0;
+			char **path_tokens;
+			struct stat buf; 
 
-	if (check_for_dir(vars->av[0]))
-		r = execute_cwd(vars);
-	else
+			if (check_for_dir(vars->av[0]))
+				r = execute_cwd(vars);
+			else
+{	
+	path = find_path(vars->env);
+	if (path != NULL)		
 	{
-		path = find_path(vars->env);
-		if (path != NULL)
+		path_dup = _strdup(path + 5);
+		path_tokens = tokenize(path_dup, ":");	
+		for (j = 0; path_tokens && path_tokens[j]; j++, free(check))
 		{
-			path_dup = _strdup(path + 5);
-			path_tokens = tokenize(path_dup, ":");
-			for (j = 0; path_tokens && path_tokens[j]; j++, free(check))
+			check = _strcat(path_tokens[j], vars->av[0]);
+			if (stat(check, &buf) == 0)
 			{
-				check = _strcat(path_tokens[j], vars->av[0]);
-				if (stat(check, &buf) == 0)
-				{
 					r = path_execute(check, vars);
 					free(check);
 					break;
 				}
-			}
-			free(path_dup);
+			}	
+			free(path_dup);		
 			if (path_tokens == NULL)
 			{
-			vars->status = 127;
-			new_exit(vars);
-			}
+				vars->status = 127;
+				new_exit(vars);
+				}	
 		}
 		if (path == NULL || path_tokens[j] == NULL)
 		{
@@ -108,19 +105,17 @@ void check_for_path(vars_t *vars)
 			vars->status = 127;
 		}
 		free(path_tokens);
-	}
-	if (r == 1)
-		new_exit(vars);
-}
+	}if (r == 1)
+			new_exit(vars);}
+
 /**
  * execute_cwd - The command to be executed in the current working directory
- * @vars: The pointer to struct of variables
+ * @vars: A pointer to struct of variables
  * Return: 1 if fail, 0 if success
  */
-int execute_cwd(vars_t *vars)
-{
+int execute_cwd(vars_t *vars){
 	pid_t child_pid;
-	struct start buf;
+	struct stat buf;
 
 	if (stat(vars->av[0], &buf) == 0)
 	{
@@ -140,7 +135,7 @@ int execute_cwd(vars_t *vars)
 				if (WIFEXITED(vars->status))
 					vars->status = WEXITSTATUS(vars->status);
 				else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
-					vars->position = 130;
+					vars->status = 130;
 				return (0);
 			}
 			vars->status = 127;
@@ -166,8 +161,7 @@ int execute_cwd(vars_t *vars)
  * @str: The command
  * Return: 0 if fail, 1 if success
  */
-int check_for_dir(char *str)
-{
+int check_for_dir(char *str){
 	unsigned int j;
 
 	for (j = 0; str[j]; j++)

@@ -7,34 +7,34 @@
  */
 void add_key(vars_t *vars)
 {
-	char **latestenv;
+	char **newenv;
 	unsigned int j;
 
 	for (j = 0; vars->env[j] != NULL; j++)
 		;
-	latestenv = malloc(sizeof(char *) * (j + 2));
-	if (latestenv == NULL)
+	newenv = malloc(sizeof(char *) * (j + 2));
+	if (newenv == NULL)
 	{
-		vars->position = 127;
+		vars->status = 127;
 		print_error(vars, NULL);
 		new_exit(vars);
 	}
 	for (j = 0; vars->env[j] != NULL; j++)
-		latestenv[j] = vars->env[j];
-	latestenv[j] = add_value(vars->av[1], vars->av[2]);
-	if (latestenv[j] == NULL)
+		newenv[j] = vars->env[j];
+	newenv[j] = add_value(vars->av[1], vars->av[2]);
+	if (newenv[j] == NULL)
 	{
 		print_error(vars, NULL);
 		free(vars->commands);
 		free(vars->av);
-		free(latestenv);
+		free(newenv);
 		free(vars->buffer);
 		free_env(vars->env);
 		exit(127);
 	}
-	latestenv[j + 1] = NULL;
+	newenv[j + 1] = NULL;
 	free(vars->env);
-	vars->env = latestenv;
+	vars->env = newenv;
 }
 
 /**

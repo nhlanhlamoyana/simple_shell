@@ -67,5 +67,5 @@ int main(int argc __attribute__((unused)), char **argv, char **environment)
 		_puts("\n");
 	free_env(vars.env);
 	free(vars.buffer);
-	exit(vars.position);
+	exit(vars.status);
 }
